@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GamerDeals - Buscador de Ofertas de Videojuegos</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <header class="navbar">
+    <div class="logo">
+      <span>🎮</span> <strong>GamerDeals</strong>
+    </div>
+    <div class="search-box">
+      <input type="text" id="search-input" placeholder="Buscar juego (ej. Cyberpunk, Witcher)...">
+      <button id="search-btn">Buscar</button>
+    </div>
+  </header>
+
+  <section class="hero">
+    <h1>Encuentra los mejores precios en PC</h1>
+    <p>Comparamos precios en Steam, Epic Games, GOG y más en tiempo real.</p>
+  </section>
+
+  <main class="container">
+    <aside class="filters">
+      <h3>Filtrar por</h3>
+      <div class="filter-group">
+        <label for="price-range">Precio máximo: <strong id="price-val">$50 USD</strong></label>
+        <input type="range" id="price-range" min="0" max="60" value="50" step="5">
+      </div>
+      <button id="reset-filters" class="secondary-btn">Restablecer filtros</button>
+    </aside>
+
+    <section class="content">
+      <h2 id="section-title">🔥 Mejores Ofertas del Momento</h2>
+      <div class="grid-container" id="deals-container">
+        <div class="loading-spinner">Cargando ofertas...</div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <p>&copy; 2026 GamerDeals — Datos proporcionados por CheapShark API.</p>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>
