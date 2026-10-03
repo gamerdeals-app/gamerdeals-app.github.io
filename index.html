@@ -4,46 +4,97 @@
   <meta charset="UTF-8">
   <meta name="impact-site-verification" content="0ede5b62-22ae-4ab0-a687-dbb5b3907ddb">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>GamerDeals - Buscador de Ofertas de Videojuegos</title>
+  <title>GamerDeals — Tu Buscador de Ofertas de PC</title>
   <link rel="stylesheet" href="styles.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
 
+  <!-- Barra de navegación principal -->
   <header class="navbar">
-    <div class="logo">
-      <span>🎮</span> <strong>GamerDeals</strong>
-    </div>
-    <div class="search-box">
-      <input type="text" id="search-input" placeholder="Buscar juego (ej. Cyberpunk, Witcher)...">
-      <button id="search-btn">Buscar</button>
+    <div class="nav-container">
+      <div class="logo">
+        <span class="logo-icon">🎮</span>
+        <span class="logo-text">Gamer<strong>Deals</strong></span>
+      </div>
+      <div class="search-box">
+        <input type="text" id="search-input" placeholder="Buscar juego (ej. Cyberpunk, Witcher)...">
+        <button id="search-btn">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+        </button>
+      </div>
     </div>
   </header>
 
+  <!-- Banner principal (Hero) -->
   <section class="hero">
-    <h1>Encuentra los mejores precios en PC</h1>
-    <p>Comparamos precios en Steam, Epic Games, GOG y más en tiempo real.</p>
+    <div class="hero-content">
+      <h1>Las mejores ofertas de juegos de PC en un solo lugar</h1>
+      <p>Comparamos precios de Steam, Humble Bundle, Epic Games, GOG y más en tiempo real.</p>
+    </div>
   </section>
 
-  <main class="container">
-    <aside class="filters">
-      <h3>Filtrar por</h3>
-      <div class="filter-group">
-        <label for="price-range">Precio máximo: <strong id="price-val">$50 USD</strong></label>
+  <!-- Contenedor principal con filtros e interfaz -->
+  <main class="main-layout">
+    <aside class="sidebar-filters">
+      <div class="filter-header">
+        <h3>⚡ Filtros</h3>
+        <button id="reset-filters" class="reset-btn">Limpiar todo</button>
+      </div>
+
+      <!-- Filtro por Tienda -->
+      <div class="filter-card">
+        <label for="store-select">Tienda</label>
+        <select id="store-select">
+          <option value="all">Todas las tiendas</option>
+          <option value="1">Steam</option>
+          <option value="2">GamersGate</option>
+          <option value="3">GreenManGaming</option>
+          <option value="7">GOG</option>
+          <option value="11">Humble Store</option>
+          <option value="25">Epic Games Store</option>
+        </select>
+      </div>
+
+      <!-- Filtro Ordenar Por -->
+      <div class="filter-card">
+        <label for="sort-select">Ordenar por</label>
+        <select id="sort-select">
+          <option value="Deal Rating">Valoración de Oferta</option>
+          <option value="Savings">Mayor Descuento (%)</option>
+          <option value="Price">Precio más Bajo</option>
+          <option value="Title">Nombre (A-Z)</option>
+        </select>
+      </div>
+
+      <!-- Filtro Rango de Precio -->
+      <div class="filter-card">
+        <div class="range-header">
+          <label for="price-range">Precio máx.</label>
+          <span id="price-val" class="price-badge">$50 USD</span>
+        </div>
         <input type="range" id="price-range" min="0" max="60" value="50" step="5">
       </div>
-      <button id="reset-filters" class="secondary-btn">Restablecer filtros</button>
     </aside>
 
-    <section class="content">
-      <h2 id="section-title">🔥 Mejores Ofertas del Momento</h2>
+    <!-- Lista de ofertas -->
+    <section class="results-section">
+      <div class="results-header">
+        <h2 id="section-title">🔥 Ofertas Destacadas</h2>
+        <span id="results-count" class="results-count">Mostrando resultados</span>
+      </div>
+      
       <div class="grid-container" id="deals-container">
-        <div class="loading-spinner">Cargando ofertas...</div>
+        <div class="loading-spinner">Cargando catálogo...</div>
       </div>
     </section>
   </main>
 
-  <footer>
-    <p>&copy; 2026 GamerDeals — Datos proporcionados por CheapShark API.</p>
+  <!-- Pie de página -->
+  <footer class="footer">
+    <p>&copy; 2026 <strong>GamerDeals</strong> — Los precios y datos son provistos en tiempo real por CheapShark API.</p>
   </footer>
 
   <script src="app.js"></script>
