@@ -1,115 +1,102 @@
-const API_BASE = 'https://www.cheapshark.com/api/1.0';
+const API_URL = 'https://www.cheapshark.com/api/1.0/deals';
 
-let listaOfertasGlobal = [];
+// Elementos del DOM
+const dealsContainer = document.getElementById('deals-container');
+const searchInput = document.getElementById('search-input');
+const searchBtn = document.getElementById('search-btn');
+const priceRange = document.getElementById('price-range');
+const priceVal = document.getElementById('price-val');
+const storeSelect = document.getElementById('store-select');
+const sortSelect = document.getElementById('sort-select');
+const resetBtn = document.getElementById('reset-filters');
+const sectionTitle = document.getElementById('section-title');
+const resultsCount = document.getElementById('results-count');
 
-document.addEventListener('DOMContentLoaded', () => {
-  obtenerOfertasDestacadas();
+// Función para obtener ofertas de la API
+async function fetchDeals() {
+  dealsContainer.innerHTML = '<div class="loading-spinner">Buscando las mejores ofertas...</div>';
 
-  document.getElementById('search-btn').addEventListener('click', ejecutarBusqueda);
-  document.getElementById('search-input').addEventListener('keypress', (e) => {
-    if (e.key === 'Enter') ejecutarBusqueda();
-  });
+  const title = searchInput.value.trim();
+  const maxPrice = priceRange.value;
+  const storeID = storeSelect.value;
+  const sortBy = sortSelect.value;
 
-  const rangeInput = document.getElementById('price-range');
-  rangeInput.addEventListener('input', (e) => {
-    document.getElementById('price-val').textContent = `$${e.target.value} USD`;
-    filtrarPorPrecio(e.target.value);
-  });
-
-  document.getElementById('reset-filters').addEventListener('click', () => {
-    rangeInput.value = 50;
-    document.getElementById('price-val').textContent = '$50 USD';
-    renderizarTarjetas(listaOfertasGlobal);
-  });
-});
-
-async function obtenerOfertasDestacadas() {
-  const container = document.getElementById('deals-container');
-  container.innerHTML = '<div class="loading-spinner">Buscando las mejores ofertas...</div>';
+  // Construir parámetros URL
+  let url = `${API_URL}?upperPrice=${maxPrice}&sortBy=${sortBy}`;
+  
+  if (title) url += `&title=${encodeURIComponent(title)}`;
+  if (storeID !== 'all') url += `&storeID=${storeID}`;
 
   try {
-    const res = await fetch(`${API_BASE}/deals?pageSize=20&sortBy=Deal%20Rating`);
-    const ofertas = await res.json();
-    listaOfertasGlobal = ofertas;
-    renderizarTarjetas(ofertas);
-  } catch (err) {
-    container.innerHTML = '<div class="no-results">Error al cargar las ofertas. Revisa tu conexión.</div>';
+    const response = await fetch(url);
+    const deals = await response.json();
+    renderDeals(deals);
+  } catch (error) {
+    dealsContainer.innerHTML = '<div class="loading-spinner">Error al cargar las ofertas. Inténtalo de nuevo.</div>';
   }
 }
 
-async function ejecutarBusqueda() {
-  const query = document.getElementById('search-input').value.trim();
-  if (!query) return obtenerOfertasDestacadas();
-
-  const container = document.getElementById('deals-container');
-  container.innerHTML = `<div class="loading-spinner">Buscando "${query}"...</div>`;
-  document.getElementById('section-title').textContent = `Resultados para: "${query}"`;
-
-  try {
-    const res = await fetch(`${API_BASE}/games?title=${encodeURIComponent(query)}&limit=20`);
-    const juegos = await res.json();
-
-    if (juegos.length === 0) {
-      container.innerHTML = '<div class="no-results">No se encontraron juegos con ese nombre.</div>';
-      return;
-    }
-
-    // Convertimos la respuesta de búsqueda de juegos al formato de oferta
-    const ofertasFormateadas = juegos.map(juego => ({
-      title: juego.external,
-      thumb: juego.thumb,
-      price: juego.cheapest,
-      normalPrice: juego.cheapest, // Precio de referencia
-      savings: 0,
-      dealID: juego.cheapestDealID
-    }));
-
-    listaOfertasGlobal = ofertasFormateadas;
-    renderizarTarjetas(ofertasFormateadas);
-  } catch (err) {
-    container.innerHTML = '<div class="no-results">Error al realizar la búsqueda.</div>';
-  }
-}
-
-function filtrarPorPrecio(precioMax) {
-  const filtradas = listaOfertasGlobal.filter(item => parseFloat(item.price) <= parseFloat(precioMax));
-  renderizarTarjetas(filtradas);
-}
-
-function renderizarTarjetas(ofertas) {
-  const container = document.getElementById('deals-container');
-  container.innerHTML = '';
-
-  if (ofertas.length === 0) {
-    container.innerHTML = '<div class="no-results">No hay juegos dentro de este rango de precio.</div>';
+// Renderizar las tarjetas
+function renderDeals(deals) {
+  if (!deals || deals.length === 0) {
+    dealsContainer.innerHTML = '<div class="loading-spinner">No se encontraron ofertas con estos filtros.</div>';
+    resultsCount.textContent = '0 resultados';
     return;
   }
 
-  ofertas.forEach(item => {
-    const descuento = Math.round(parseFloat(item.savings));
-    const card = document.createElement('article');
-    card.className = 'card';
+  resultsCount.textContent = `${deals.length} ofertas encontradas`;
 
-    // Enlace de la oferta (aquí se canalizan las compras)
-    const enlaceOferta = `https://www.cheapshark.com/redirect?dealID=${item.dealID}`;
+  dealsContainer.innerHTML = deals.map(item => {
+    const discount = Math.round(item.savings);
+    const thumb = item.thumb || 'https://via.placeholder.com/300x140?text=Sin+Imagen';
+    const redirectUrl = `https://www.cheapshark.com/redirect?dealID=${item.dealID}`;
 
-    card.innerHTML = `
-      <img src="${item.thumb}" alt="${item.title}" loading="lazy">
-      <div class="card-body">
-        <h3 class="card-title">${item.title}</h3>
-        <div class="price-row">
-          <div>
-            ${item.savings > 0 ? `<div class="old-price">$${item.normalPrice} USD</div>` : ''}
-            <div class="current-price">$${item.price} USD</div>
+    return `
+      <article class="deal-card">
+        <img src="${thumb}" alt="${item.title}" class="deal-thumb" loading="lazy">
+        <div class="deal-info">
+          <h4 class="deal-title">${item.title}</h4>
+          <div class="price-row">
+            <span class="savings-tag">-${discount}%</span>
+            <div class="prices">
+              <span class="old-price">$${item.normalPrice}</span>
+              <span class="new-price">$${item.salePrice}</span>
+            </div>
           </div>
-          ${descuento > 0 ? `<span class="badge">-${descuento}%</span>` : ''}
+          <a href="${redirectUrl}" target="_blank" rel="noopener noreferrer" class="deal-btn">Ver Oferta</a>
         </div>
-        <a href="${enlaceOferta}" target="_blank" rel="noopener noreferrer" class="deal-link">
-          Ver Oferta
-        </a>
-      </div>
+      </article>
     `;
-
-    container.appendChild(card);
-  });
+  }).join('');
 }
+
+// Event Listeners
+searchBtn.addEventListener('click', () => {
+  sectionTitle.textContent = searchInput.value.trim() ? `Resultados para "${searchInput.value}"` : '🔥 Ofertas Destacadas';
+  fetchDeals();
+});
+
+searchInput.addEventListener('keypress', (e) => {
+  if (e.key === 'Enter') searchBtn.click();
+});
+
+priceRange.addEventListener('input', (e) => {
+  priceVal.textContent = `$${e.target.value} USD`;
+});
+
+priceRange.addEventListener('change', fetchDeals);
+storeSelect.addEventListener('change', fetchDeals);
+sortSelect.addEventListener('change', fetchDeals);
+
+resetBtn.addEventListener('click', () => {
+  searchInput.value = '';
+  priceRange.value = 50;
+  priceVal.textContent = '$50 USD';
+  storeSelect.value = 'all';
+  sortSelect.value = 'Deal Rating';
+  sectionTitle.textContent = '🔥 Ofertas Destacadas';
+  fetchDeals();
+});
+
+// Carga inicial
+fetchDeals();
